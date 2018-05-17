@@ -87,7 +87,7 @@ print(len(set_of_text_receivers_tel))
 
 
 """
-### 老师们的做法：
+### Udacity 老师们的做法：
 
 #这里使用set数据类型的话可以更加简洁的完成：
 
@@ -108,4 +108,14 @@ for text in texts:
 result = result - remove
 
 print("These numbers could be telemarketers: "+ "\n" + "\n".join(sorted(result)))
+"""
+
+
+"""
+### Udacity 第二位老师的做法：
+
+call,beCalled,time,last = zip(*calls)
+msg,beMsged,time = zip(*texts)
+saleman = set(call)-set(beCalled)-set(msg)-set(beMsged);
+print("These numbers could be telemarketers: " + "\n" + "\n".join(sorted(saleman)))
 """

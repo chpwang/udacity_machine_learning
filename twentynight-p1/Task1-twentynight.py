@@ -40,3 +40,13 @@ set_of_tel_numbers = set(tel_numbers)
 
 # output message showing the number of tel numbers in records
 print(message_template.format(len(set_of_tel_numbers)))
+
+
+"""
+# Udacity 老师们的方法（用 * operator 拆包，再用 zip 重新封装）
+
+textPhone, receiveText, textTime = zip(*texts)
+callPhone, receiveCall, callTime, seconds = zip(*calls)
+numCount = len(set(textPhone) | set(receiveText) | set(callPhone) | set(receiveCall))
+print("There are {} different telephone numbers in the records".format(numCount))
+"""

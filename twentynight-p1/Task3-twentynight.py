@@ -97,7 +97,7 @@ for code in codes_list_sorted:
 """
 # Part 2
 """
-message_template2 = "{}% percent of calls from fixed lines in Bangalore are calls to other fixed lines in Bangalore."
+message_template2 = "{} percent of calls from fixed lines in Bangalore are calls to other fixed lines in Bangalore."
 
 ratio_of_bangalore_callee = convert_to_percentage(codes_list.count("080")/len(codes_list))
 
