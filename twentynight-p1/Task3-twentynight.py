@@ -57,7 +57,10 @@ message_template1 = "The numbers called by people in Bangalore have codes:"
 tel_num_bangalore = re.compile(r"\(080\)")
 tel_num_fixline = re.compile(r"\((\d+)\)")
 tel_num_telemarketers = re.compile(r"(140).+")
-tel_num_mobile = re.compile(r"(\d+)\s(\d+)")
+tel_num_mobile = re.compile(r"(\d{4})\d\s(\d+)")
+
+def convert_to_percentage(f):
+    return round(f * 100.0, 2)
 
 
 for i in range(len(calls)):
@@ -94,9 +97,9 @@ for code in codes_list_sorted:
 """
 # Part 2
 """
-message_template2 = "{} percent of calls from fixed lines in Bangalore are calls to other fixed lines in Bangalore."
+message_template2 = "{}% percent of calls from fixed lines in Bangalore are calls to other fixed lines in Bangalore."
 
-ratio_of_bangalore_callee = round(codes_list.count("080")/len(codes_list), 2)
+ratio_of_bangalore_callee = convert_to_percentage(codes_list.count("080")/len(codes_list))
 
 print(message_template2.format(ratio_of_bangalore_callee))
 

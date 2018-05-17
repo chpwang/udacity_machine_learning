@@ -37,13 +37,13 @@ message_template = "{} spent the longest time, {} seconds, on the phone during S
 for i in range(len(calls)):
     tel_num1 = calls[i][0]
     tel_num2 = calls[i][1]
-    spent_time = calls[i][0][3]
+    spent_time = calls[i][3]
     calls_dict[tel_num1] = calls_dict.get(tel_num1, 0) + int(spent_time)
     calls_dict[tel_num2] = calls_dict.get(tel_num2, 0) + int(spent_time)
 
+
 # find the tel number that spent longest time
 tel_num_with_longest_time = max(calls_dict.keys(), key=(lambda k: calls_dict[k]))
-
 
 # print(len(calls_dict.items()))
 # print(tel_num_with_longest_time)

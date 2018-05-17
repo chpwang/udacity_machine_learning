@@ -84,3 +84,28 @@ print(len(texts))
 print(len(set_of_text_senders_tel))
 print(len(set_of_text_receivers_tel))
 """
+
+
+"""
+### 老师们的做法：
+
+#这里使用set数据类型的话可以更加简洁的完成：
+
+#创建最后结果和需要移除的变量
+result = set()
+remove = set()
+
+#遍历calls列表
+for call in calls:
+    result.add(call[0])
+    remove.add(call[1])
+
+#遍历texts列表
+for text in texts:
+    remove.add(text[0])
+    remove.add(text[1])
+#进行条件筛选
+result = result - remove
+
+print("These numbers could be telemarketers: "+ "\n" + "\n".join(sorted(result)))
+"""
