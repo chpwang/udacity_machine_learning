@@ -25,53 +25,24 @@ def get_filters():
     """
     print('Hello! Let\'s explore some US bikeshare data!')
     # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
-    while True:
-        try:
-            print("Would you like to see data for Chicago, New York City, or Washington?")
-            city = input().lower()
-        except Exception as e:
-            print("Exception occurred: {} \n".format(e))
-        else:
-            if city in CITY_DATA:
-                break
-            else:
-                print("Invalid Input...Please enter a city name. \n")
-                continue
+    input_m = "Would you like to see data for Chicago, New York City, or Washington?"
+    error_m = "Invalid Input...Please enter a city name. \n"
+    city = get_value_from_input(input_m, error_m, CITY_DATA)
+
 
     # TO DO: get user input for month (all, january, february, ... , june)
-    while True:
-        try:
-            print("Would you like to filter by month?")
-            print("Type name of the month or type 'all' for no month filter.")
-            month = input().lower()
-        except Exception as e:
-            print("Exception occurred: {} \n".format(e))
-        else:
-            if month == "all":
-                break
-            elif month in months:
-                break
-            else:
-                print("Invalid Input...Please enter a name of days of a week. \n")
-                continue
+    input_m = "Would you like to filter by month? \n"
+    input_m += "Type name of the month or type 'all' for no month filter."
+    error_m = "Invalid Input...Please enter a name of month. \n"
+    month = get_value_from_input(input_m, error_m, months)
+
 
     # TO DO: get user input for day of week (all, monday, tuesday, ... sunday)
-    while True:
-        try:
-            print("Would you like to filter by week day?")
-            print("Type name of the day(e.g. Sunday) or type 'all' for no day filter.")
-            day = input().lower()
-        except Exception as e:
-            print("Exception occurred: {} \n".format(e))
-        else:
-            if day == "all":
-                break
-            elif day in weekdays :
-                break
-            else:
-                message_template = "There's no such day in 「 {} 」 dataset...Please enter another day name. \n"
-                print(message_template.format(city))
-                continue
+    input_m = "Would you like to filter by week day? \n"
+    input_m += "Type name of the day(e.g. Sunday) or type 'all' for no day filter."
+    error_m = "Invalid Input...Please enter a name of days of a week. \n"
+    day = get_value_from_input(input_m, error_m, weekdays)
+
 
     print('-'*40)
     return city, month, day
@@ -244,10 +215,28 @@ def user_stats(df, city_filter):
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
 
+
 def seconds_to_minutes_and_hours(seconds):
     m, s = divmod(int(seconds), 60)    # .divmod() - a single division to produce both the quotient and the remainder
     h, m = divmod(m, 60)
     return h, m, s
+
+
+def get_value_from_input(input_prompt, error_message, enterable_list):
+    while True:
+        try:
+            print(input_prompt)
+            ret = input().lower()
+        except Exception as e:
+            print("Exception occurred: {} \n".format(e))
+        else:
+            if isinstance(enterable_list, list):
+                enterable_list.append("all")
+            if ret in enterable_list:
+                return ret
+            else:
+                print(error_message)
+                continue
 
 
 def main():
