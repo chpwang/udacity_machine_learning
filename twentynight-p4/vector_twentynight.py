@@ -3,6 +3,7 @@ from decimal import Decimal, getcontext
 
 # 设置小数点后保留的位数
 getcontext().prec = 19
+# 设置公差，用于判断变量是否为零
 TOLERANCE = 1e-10
 
 class Vector(object):
@@ -55,18 +56,18 @@ class Vector(object):
       raise Exception("You can't normalize Zero Vector!")
 
   def angle_with(self, v, in_degrees=False):
-      try:
+    try:
 
-        mag_1 = self.magnitude()
-        mag_2 = v.magnitude()
-        if in_degrees:
-          return math.degrees(math.acos(self.dot_product_with(v)/(mag_1*mag_2)))
-        else:
-          return math.acos(self.dot_product_with(v)/(mag_1*mag_2))
- 
-      except ZeroDivisionError:
-        #print("At least one of the vector is Zero Vector! No angle defined.")
-        raise Exception("One of the vector is Zero Vector! No angle defined.")
+      mag_1 = self.magnitude()
+      mag_2 = v.magnitude()
+      if in_degrees:
+        return math.degrees(math.acos(self.dot_product_with(v)/(mag_1*mag_2)))
+      else:
+        return math.acos(self.dot_product_with(v)/(mag_1*mag_2))
+
+    except ZeroDivisionError:
+      #print("At least one of the vector is Zero Vector! No angle defined.")
+      raise Exception("One of the vector is Zero Vector! No angle defined.")
 
   def __is_zero_vector(self):
     return self.magnitude() < TOLERANCE
