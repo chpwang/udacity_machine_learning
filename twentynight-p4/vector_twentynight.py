@@ -1,7 +1,7 @@
 import math
 from decimal import Decimal, getcontext
 
-# 设置小数点后保留的位数
+# 设置 Decimal 数据类型小数点后保留的位数
 getcontext().prec = 19
 # 设置公差，用于判断变量是否为零
 TOLERANCE = 1e-10
