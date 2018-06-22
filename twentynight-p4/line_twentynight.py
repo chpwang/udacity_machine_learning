@@ -118,9 +118,9 @@ class Line(object):
   def intersection_point_with(self, line_2nd):
     if self.is_parallel_to(line_2nd):
       if self == line_2nd:
-        return self.INFINITE_INTERSECTION_POINT_FOUND_MSG
+        return self
       else:
-        return self.NO_UNIQUE_INTERSECTION_POINT_FOUND_MSG
+        return None
     else:
       n1 = self.normal_vector.coordinates
       n2 = line_2nd.normal_vector.coordinates
