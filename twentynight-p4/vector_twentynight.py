@@ -69,16 +69,16 @@ class Vector(object):
       #print("At least one of the vector is Zero Vector! No angle defined.")
       raise Exception("One of the vector is Zero Vector! No angle defined.")
 
-  def __is_zero_vector(self):
+  def is_zero_vector(self):
     return self.magnitude() < TOLERANCE
   
   def is_parallel_to(self, v):
-    if v.__is_zero_vector() or self.__is_zero_vector():
+    if v.is_zero_vector() or self.is_zero_vector():
       return True
     else:
       s_m = self.normalization()
       v_m = v.normalization()
-      return s_m.minus(v_m).__is_zero_vector() or s_m.plus(v_m).__is_zero_vector() 
+      return s_m.minus(v_m).is_zero_vector() or s_m.plus(v_m).is_zero_vector() 
 
   def is_orthogonal_to(self, v):
     return abs(self.dot_product_with(v)) < TOLERANCE

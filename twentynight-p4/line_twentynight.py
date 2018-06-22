@@ -19,7 +19,7 @@ class Line(object):
     self.normal_vector = normal_vector
 
     if not constant_term:
-      constant_term = Decimal('0')
+      constant_term = 0
     self.constant_term = Decimal(constant_term)
 
     self.set_basepoint()
@@ -92,20 +92,32 @@ class Line(object):
   
   def is_parallel_to(self, line_2nd):
     return self.normal_vector.is_parallel_to(line_2nd.normal_vector)
-  
-  def is_coincide_with(self, line_2nd):
-    if self.is_parallel_to(line_2nd):
+
+  # 两直线重合，则两直线相等
+  def __eq__(self, line_2nd):
+
+    # 判断法向量是否为零向量
+    if self.normal_vector.is_zero_vector():
+      if line_2nd.normal_vector.is_zero_vector():
+        # 此时两条直线的法向量都是零向量，检查常数项是否相等，相等则为同一条直线(重合)
+        diff = self.constant_term - line_2nd.constant_term
+        return MyDecimal(diff).is_near_zero()
+      else:
+        return False
+    elif line_2nd.normal_vector.is_zero_vector():
+      return False
+    elif self.is_parallel_to(line_2nd):
       p1 = self.basepoint
       p2 = line_2nd.basepoint
       v = p2.minus(p1)
-      return p1 == p2 or self.normal_vector.is_orthogonal_to(v)
+      return self.normal_vector.is_orthogonal_to(v)
     else:
       return False
 
 
   def intersection_point_with(self, line_2nd):
     if self.is_parallel_to(line_2nd):
-      if self.is_coincide_with(line_2nd):
+      if self == line_2nd:
         return self.INFINITE_INTERSECTION_POINT_FOUND_MSG
       else:
         return self.NO_UNIQUE_INTERSECTION_POINT_FOUND_MSG
@@ -144,7 +156,6 @@ class Line(object):
 class MyDecimal(Decimal):
   def is_near_zero(self, eps=1e-10):
     return abs(self) < eps
-
 
 
 
