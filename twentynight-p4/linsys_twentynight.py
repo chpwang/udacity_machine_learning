@@ -54,7 +54,7 @@ class LinearSystem(object):
         indices[i] = p.first_nonzero_index(p.normal_vector.coordinates)
       except Exception as e:
         if str(e) == Plane.NO_NONZERO_ELTS_FOUND_MSG:
-            continue
+            continue # 这个 continue 决定了即使找不到非零项，也不会报错
         else:
             raise e
 
@@ -90,7 +90,6 @@ class LinearSystem(object):
           jrow_i_term_coef = new_linearSys[j].normal_vector.coordinates[k]
           coef = jrow_i_term_coef / irow_i_term_coef * (-1)
           new_linearSys.add_multiple_times_row_to_row(coef, i, j)
-      
       k += 1
 
       '''
@@ -116,6 +115,13 @@ class LinearSystem(object):
       '''
 
     return new_linearSys
+
+  
+  def compute_rref(self):
+    tri_form = self.compute_triangular_form()
+
+
+    return tri_form
 
 
   def __len__(self):
@@ -155,7 +161,6 @@ class MyDecimal(Decimal):
 
 
 
-
 '''
 # test - 针对测试我写的 compute_triangular_form() 方法
 # 可以运行查看和 Udacity 老师写法区别
@@ -163,12 +168,12 @@ p1 = Plane(normal_vector=Vector(['1','0','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['0','0','1']), constant_term='2')
 p3 = Plane(normal_vector=Vector(['1','0','-1']), constant_term='3')
 p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
-s = LinearSystem([p1,p2,p3,p4])
+p5 = Plane(normal_vector=Vector(['0','0','0']), constant_term='2')
+s = LinearSystem([p1,p2,p3,p4,p5])
 print(s)
 t = s.compute_triangular_form()
 print(t)
 '''
-
 
 '''
 # test - function compute_triangular_form()
