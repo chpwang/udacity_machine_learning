@@ -47,8 +47,6 @@ class LinearSystem(object):
   # 返回每一列（每一个方程）的第一个非零项的索引
   def indices_of_first_nonzero_terms_in_each_row(self):
     num_equations = len(self)
-    # num_variables = self.dimension  # 得出有多少个未知变量需要计算
-
     indices = [-1] * num_equations
 
     for i,p in enumerate(self.planes):
@@ -61,6 +59,34 @@ class LinearSystem(object):
             raise e
 
     return indices
+  
+  def compute_triangular_form(self):
+    new_linearSys = deepcopy(self)
+
+    for i in range(len(new_linearSys)-1):
+      # 每次循环都更新矩阵里每一行第一个非零项的位置
+      nonz_indices = new_linearSys.indices_of_first_nonzero_terms_in_each_row()
+
+      # 若在 i 行之后的某一行里，存在第 i 项的系数不为零，则换位（swap），确保第 i 行第 i 项系数非零
+      if nonz_indices[i] != i:
+        if i in nonz_indices:
+          row_to_swap = nonz_indices.index(i)
+          new_linearSys.swap_rows(i, row_to_swap)
+          # 换位后更新各行第一个非零项的 位置 列表
+          nonz_indices = new_linearSys.indices_of_first_nonzero_terms_in_each_row()
+        else:
+          # 如果所有行的第 i 项的系数都为 0 ，则直接跳到下一次循环
+          continue
+      
+      for j in range(i+1, len(new_linearSys)):
+        if nonz_indices[j] == i:
+          # 如果第 j 行，第 i 项的系数非零，则用第 i 行（i < j）消去此 j 行的第 i 项
+          irow_i_term_coef = new_linearSys[i].normal_vector.coordinates[i]
+          jrow_i_term_coef = new_linearSys[j].normal_vector.coordinates[i]
+          coef = jrow_i_term_coef / irow_i_term_coef * (-1)
+          new_linearSys.add_multiple_times_row_to_row(coef, i, j)
+
+    return new_linearSys
 
 
   def __len__(self):
@@ -96,6 +122,52 @@ class MyDecimal(Decimal):
 
 
 
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == p2):
+    print('test case 1 failed')
+else:
+  print('test case 1 success')
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == Plane(constant_term='1')):
+    print('test case 2 failed')
+else:
+  print('test case 2 success')
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
+p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
+s = LinearSystem([p1,p2,p3,p4])
+t = s.compute_triangular_form()
+if not (t[0] == p1 and
+        t[1] == p2 and
+        t[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
+        t[3] == Plane()):
+    print('test case 3 failed')
+else:
+  print('test case 3 success')
+
+p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
+s = LinearSystem([p1,p2,p3])
+t = s.compute_triangular_form()
+if not (t[0] == Plane(normal_vector=Vector(['1','-1','1']), constant_term='2') and
+        t[1] == Plane(normal_vector=Vector(['0','1','1']), constant_term='1') and
+        t[2] == Plane(normal_vector=Vector(['0','0','-9']), constant_term='-2')):
+    print('test case 4 failed')
+else:
+  print('test case 4 success')
 
 
 
