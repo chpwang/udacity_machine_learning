@@ -44,7 +44,7 @@ class LinearSystem(object):
     self.planes[row_to_be_added_to] = self.planes[row_to_be_added_to].plus(plane_to_add)
     return self
 
-  # 返回每一列（每一个方程）的第一个非零项的索引
+  # 返回每一行（每一个方程）的第一个非零项的索引
   def indices_of_first_nonzero_terms_in_each_row(self):
     num_equations = len(self)
     indices = [-1] * num_equations
@@ -59,7 +59,23 @@ class LinearSystem(object):
             raise e
 
     return indices
+
+
+  # 消除第 term_index 列的所有其他项（消去除第 base_row 行之外，所有方程的第 term_index 项）
+  def eliminate_other_column_term_from_row_to_row(self, base_row, star_row, end_row, step, term_index):
+
+    for j in range(star_row, end_row, step):
+      c = self[j].normal_vector.coordinates[term_index]
+      if not MyDecimal(c).is_near_zero():
+        # 如果第 j 行，第 k 项的系数非零，则用第 i 行（i < j）消去此 j 行的第 k 项
+        irow_term_onz_coef = self[base_row].normal_vector.coordinates[term_index]
+        jrow_term_onz_coef = self[j].normal_vector.coordinates[term_index]
+        coef_ji = jrow_term_onz_coef / irow_term_onz_coef * (-1)
+        self.add_multiple_times_row_to_row(coef_ji, base_row, j)
+    
+    return self
   
+
   def compute_triangular_form(self):
     new_linearSys = deepcopy(self)
     k = 0  # 初始化, 从位置为 0 的变量（即 x1）开始消元
@@ -83,17 +99,13 @@ class LinearSystem(object):
             continue
         break
 
-      for j in range(i+1, len(new_linearSys)):
-        if nonz_indices[j] == k:
-          # 如果第 j 行，第 k 项的系数非零，则用第 i 行（i < j）消去此 j 行的第 k 项
-          irow_i_term_coef = new_linearSys[i].normal_vector.coordinates[k]
-          jrow_i_term_coef = new_linearSys[j].normal_vector.coordinates[k]
-          coef = jrow_i_term_coef / irow_i_term_coef * (-1)
-          new_linearSys.add_multiple_times_row_to_row(coef, i, j)
+      # 消除第 k 列的所有其他项（消去除第 i 行之外，所有方程的第 k 项）
+      new_linearSys.eliminate_other_column_term_from_row_to_row(i, i+1, len(new_linearSys), 1, k)
       k += 1
+      
 
       '''
-      # 我的方法 - 区别参考最下方的测试代码
+      # 我的另一种方法 - 区别参考最下方的测试代码
       # 若在 i 行之后的某一行里，存在第 i 项的系数不为零，则换位（swap），确保第 i 行第 i 项系数非零
       if nonz_indices[i] != i:
         if i in nonz_indices:
@@ -119,7 +131,24 @@ class LinearSystem(object):
   
   def compute_rref(self):
     tri_form = self.compute_triangular_form()
+    print(tri_form)
+    for i in range(len(tri_form)-1, -1, -1):
+      n_vec = tri_form[i].normal_vector
+      const_term = tri_form[i].constant_term
 
+      if n_vec.is_zero_vector():
+        # 判断方程是否是 0=k 或者 0=0 的形式
+        if not MyDecimal(const_term).is_near_zero():
+          tri_form[i] = Plane(constant_term=1)
+        else:
+          continue
+      else:
+        first_nonz_ind = Plane.first_nonzero_index(n_vec.coordinates)
+        coef = n_vec.coordinates[first_nonz_ind]
+        tri_form.multiply_coefficient_and_row(1/coef, i)
+
+        # 消除第 k 列的所有其他项（消去除第 i 行之外，所有方程的第 k 项）
+        tri_form.eliminate_other_column_term_from_row_to_row(i, i-1, -1, -1, first_nonz_ind)
 
     return tri_form
 
@@ -158,11 +187,72 @@ class MyDecimal(Decimal):
 
 
 
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+print(s)
+r = s.compute_rref()
+print(r)
+if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='-1') and
+        r[1] == p2):
+    print('test case 1 failed')
+else:
+  print('test case 1 success')
+
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
+s = LinearSystem([p1,p2])
+print(s)
+r = s.compute_rref()
+print(r)
+if not (r[0] == p1 and
+        r[1] == Plane(constant_term='1')):
+    print('test case 2 failed')
+else:
+  print('test case 2 success')
+
+p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
+p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
+s = LinearSystem([p1,p2,p3,p4])
+print(s)
+r = s.compute_rref()
+print(r)
+if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term='0') and
+        r[1] == p2 and
+        r[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
+        r[3] == Plane()):
+    print('test case 3 failed')
+else:
+  print('test case 3 success')
+
+p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
+s = LinearSystem([p1,p2,p3])
+print(s)
+r = s.compute_rref()
+print(r)
+if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term=Decimal('23')/Decimal('9')) and
+        r[1] == Plane(normal_vector=Vector(['0','1','0']), constant_term=Decimal('7')/Decimal('9')) and
+        r[2] == Plane(normal_vector=Vector(['0','0','1']), constant_term=Decimal('2')/Decimal('9'))):
+    print('test case 4 failed')
+else:
+  print('test case 4 success')
+
+
+
+
+
+
+
 
 
 
 '''
-# test - 针对测试我写的 compute_triangular_form() 方法
+# test - 针对测试我写的另一种 compute_triangular_form() 方法
 # 可以运行查看和 Udacity 老师写法区别
 p1 = Plane(normal_vector=Vector(['1','0','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['0','0','1']), constant_term='2')
