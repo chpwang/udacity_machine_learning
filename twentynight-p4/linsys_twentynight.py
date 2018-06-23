@@ -61,7 +61,7 @@ class LinearSystem(object):
     return indices
 
 
-  # 消除第 term_index 列的所有其他项（消去除第 base_row 行之外，所有方程的第 term_index 项）
+  # 消除第 term_index 列的所有其他项（消去除第 base_row 行之外，所有大于 i 行的方程的第 term_index 项）
   def eliminate_other_column_term_from_row_to_row(self, base_row, star_row, end_row, step, term_index):
 
     for j in range(star_row, end_row, step):
@@ -131,7 +131,7 @@ class LinearSystem(object):
   
   def compute_rref(self):
     tri_form = self.compute_triangular_form()
-    print(tri_form)
+
     for i in range(len(tri_form)-1, -1, -1):
       n_vec = tri_form[i].normal_vector
       const_term = tri_form[i].constant_term
@@ -147,7 +147,7 @@ class LinearSystem(object):
         coef = n_vec.coordinates[first_nonz_ind]
         tri_form.multiply_coefficient_and_row(1/coef, i)
 
-        # 消除第 k 列的所有其他项（消去除第 i 行之外，所有方程的第 k 项）
+        # 消除第 first_nonz_ind 列的所有其他项（消去除第 i 行之外，所有小于 i 行的方程的第 first_nonz_ind 项）
         tri_form.eliminate_other_column_term_from_row_to_row(i, i-1, -1, -1, first_nonz_ind)
 
     return tri_form
@@ -187,6 +187,17 @@ class MyDecimal(Decimal):
 
 
 
+
+
+
+
+
+
+
+
+
+'''
+# test - function compute_rref()
 p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
 s = LinearSystem([p1,p2])
@@ -241,9 +252,7 @@ if not (r[0] == Plane(normal_vector=Vector(['1','0','0']), constant_term=Decimal
     print('test case 4 failed')
 else:
   print('test case 4 success')
-
-
-
+'''
 
 
 
