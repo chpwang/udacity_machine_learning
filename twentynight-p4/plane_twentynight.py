@@ -113,7 +113,18 @@ class Plane(object):
     else:
       return False
 
+  # 方程两边同时乘以常数 c
+  def times_scalar(self, c):
+    n_vec = self.normal_vector.times_scalar(c)
+    const = self.constant_term * c
+    return Plane(n_vec, const)
 
+  # 两方程（两平面）相加
+  def plus(self, p):
+    n_vec = self.normal_vector.plus(p.normal_vector)
+    const = self.constant_term + p.constant_term
+    return Plane(n_vec, const)
+  
   '''
   # 求多维交点 - 高斯消元法之前暂时注释掉
   def intersection_point_with(self, plane_2nd):
