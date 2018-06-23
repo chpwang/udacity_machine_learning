@@ -62,11 +62,39 @@ class LinearSystem(object):
   
   def compute_triangular_form(self):
     new_linearSys = deepcopy(self)
+    k = 0  # 初始化, 从位置为 0 的变量（即 x1）开始消元
 
     for i in range(len(new_linearSys)-1):
       # 每次循环都更新矩阵里每一行第一个非零项的位置
       nonz_indices = new_linearSys.indices_of_first_nonzero_terms_in_each_row()
 
+      while k < new_linearSys.dimension:
+        # 若在 i 行之后的某一行里，存在第 i 项的系数不为零，则换位（swap），确保第 i 行第 i 项系数非零
+        if nonz_indices[i] != k:
+          if i in nonz_indices:
+            row_to_swap = nonz_indices.index(i)
+            new_linearSys.swap_rows(i, row_to_swap)
+            # 换位后更新各行第一个非零项的 位置 列表
+            nonz_indices = new_linearSys.indices_of_first_nonzero_terms_in_each_row()
+            break
+          else:
+            # 如果所有行的第 i 项的系数都为 0 ，则直接跳到下一次循环
+            k += 1
+            continue
+        break
+
+      for j in range(i+1, len(new_linearSys)):
+        if nonz_indices[j] == k:
+          # 如果第 j 行，第 k 项的系数非零，则用第 i 行（i < j）消去此 j 行的第 k 项
+          irow_i_term_coef = new_linearSys[i].normal_vector.coordinates[k]
+          jrow_i_term_coef = new_linearSys[j].normal_vector.coordinates[k]
+          coef = jrow_i_term_coef / irow_i_term_coef * (-1)
+          new_linearSys.add_multiple_times_row_to_row(coef, i, j)
+      
+      k += 1
+
+      '''
+      # 我的方法 - 区别参考最下方的测试代码
       # 若在 i 行之后的某一行里，存在第 i 项的系数不为零，则换位（swap），确保第 i 行第 i 项系数非零
       if nonz_indices[i] != i:
         if i in nonz_indices:
@@ -77,7 +105,7 @@ class LinearSystem(object):
         else:
           # 如果所有行的第 i 项的系数都为 0 ，则直接跳到下一次循环
           continue
-      
+
       for j in range(i+1, len(new_linearSys)):
         if nonz_indices[j] == i:
           # 如果第 j 行，第 i 项的系数非零，则用第 i 行（i < j）消去此 j 行的第 i 项
@@ -85,6 +113,7 @@ class LinearSystem(object):
           jrow_i_term_coef = new_linearSys[j].normal_vector.coordinates[i]
           coef = jrow_i_term_coef / irow_i_term_coef * (-1)
           new_linearSys.add_multiple_times_row_to_row(coef, i, j)
+      '''
 
     return new_linearSys
 
@@ -123,10 +152,32 @@ class MyDecimal(Decimal):
 
 
 
+
+
+
+
+'''
+# test - 针对测试我写的 compute_triangular_form() 方法
+# 可以运行查看和 Udacity 老师写法区别
+p1 = Plane(normal_vector=Vector(['1','0','1']), constant_term='1')
+p2 = Plane(normal_vector=Vector(['0','0','1']), constant_term='2')
+p3 = Plane(normal_vector=Vector(['1','0','-1']), constant_term='3')
+p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
+s = LinearSystem([p1,p2,p3,p4])
+print(s)
+t = s.compute_triangular_form()
+print(t)
+'''
+
+
+'''
+# test - function compute_triangular_form()
 p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['0','1','1']), constant_term='2')
 s = LinearSystem([p1,p2])
+print(s)
 t = s.compute_triangular_form()
+print(t)
 if not (t[0] == p1 and
         t[1] == p2):
     print('test case 1 failed')
@@ -136,7 +187,9 @@ else:
 p1 = Plane(normal_vector=Vector(['1','1','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['1','1','1']), constant_term='2')
 s = LinearSystem([p1,p2])
+print(s)
 t = s.compute_triangular_form()
+print(t)
 if not (t[0] == p1 and
         t[1] == Plane(constant_term='1')):
     print('test case 2 failed')
@@ -148,7 +201,9 @@ p2 = Plane(normal_vector=Vector(['0','1','0']), constant_term='2')
 p3 = Plane(normal_vector=Vector(['1','1','-1']), constant_term='3')
 p4 = Plane(normal_vector=Vector(['1','0','-2']), constant_term='2')
 s = LinearSystem([p1,p2,p3,p4])
+print(s)
 t = s.compute_triangular_form()
+print(t)
 if not (t[0] == p1 and
         t[1] == p2 and
         t[2] == Plane(normal_vector=Vector(['0','0','-2']), constant_term='2') and
@@ -161,14 +216,16 @@ p1 = Plane(normal_vector=Vector(['0','1','1']), constant_term='1')
 p2 = Plane(normal_vector=Vector(['1','-1','1']), constant_term='2')
 p3 = Plane(normal_vector=Vector(['1','2','-5']), constant_term='3')
 s = LinearSystem([p1,p2,p3])
+print(s)
 t = s.compute_triangular_form()
+print(t)
 if not (t[0] == Plane(normal_vector=Vector(['1','-1','1']), constant_term='2') and
         t[1] == Plane(normal_vector=Vector(['0','1','1']), constant_term='1') and
         t[2] == Plane(normal_vector=Vector(['0','0','-9']), constant_term='-2')):
     print('test case 4 failed')
 else:
   print('test case 4 success')
-
+'''
 
 
 
