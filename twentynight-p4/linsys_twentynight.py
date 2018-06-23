@@ -10,8 +10,8 @@ getcontext().prec = 30
 class LinearSystem(object):
 
   ALL_PLANES_MUST_BE_IN_SAME_DIM_MSG = 'All planes in the system should live in the same dimension'
-  NO_SOLUTIONS_MSG = 'No solutions'
-  INF_SOLUTIONS_MSG = 'Infinitely many solutions'
+  NO_SOLUTIONS_MSG = 'No solutions found'
+  INF_SOLUTIONS_MSG = 'Infinitely many solutions found'
 
   def __init__(self, planes):
     try:
@@ -152,6 +152,45 @@ class LinearSystem(object):
 
     return tri_form
 
+  
+  def compute_solution(self):
+    rrf_form = self.compute_rref()
+
+    rrf_form.__raise_exception_if_no_solution()
+    rrf_form.__raise_exception_if_there_are_infinite_solutions()
+
+    output = ''
+    for i in range(self.dimension):
+      output += "x{} = {} \n".format(i+1, round(rrf_form[i].constant_term, 3))
+    
+    return output
+
+
+
+  
+  def __raise_exception_if_no_solution(self):
+    # 若法向量为零向量，且常数项不为零，则抛出异常提示无解
+    for p in self.planes:
+      try:
+        p.first_nonzero_index(p.normal_vector.coordinates)
+      except Exception as e:
+        # 查看报错信息是否和 Plane 类型里的报错一样
+        if str(e) == 'No nonzero elements found':
+          const_t = MyDecimal(p.constant_term)
+          if not const_t.is_near_zero(): 
+            raise Exception(self.NO_SOLUTIONS_MSG)
+        else:
+          raise e
+
+  def __raise_exception_if_there_are_infinite_solutions(self):
+    # 在确定有解的前提下，若第 i 行的第一个含非零系数的项不为 i ，则方程化简过程中有变量缺失，故含有多解
+    first_nonz_indices = self.indices_of_first_nonzero_terms_in_each_row()
+    for i in range(self.dimension):
+      if first_nonz_indices[i] != i:
+        raise Exception(self.INF_SOLUTIONS_MSG)
+    
+
+
 
   def __len__(self):
     return len(self.planes)
@@ -188,11 +227,28 @@ class MyDecimal(Decimal):
 
 
 
+'''
+# test - function compute_solution()
+p1 = Plane(normal_vector=Vector([5.862, 1.178, -10.366]), constant_term=-8.15)
+p2 = Plane(normal_vector=Vector([-2.931, -0.589, 5.183]), constant_term=-4.075)
+s = LinearSystem([p1,p2])
+print(s.compute_solution())
 
 
+p1 = Plane(normal_vector=Vector([8.631, 5.112, -1.816]), constant_term=-5.113)
+p2 = Plane(normal_vector=Vector([4.315, 11.132, -5.27]), constant_term=-6.775)
+p3 = Plane(normal_vector=Vector([-2.158, 3.01, -1.727]), constant_term=-0.831)
+s = LinearSystem([p1,p2,p3])
+print(s.compute_solution())
 
 
-
+p1 = Plane(normal_vector=Vector([5.262, 2.739, -9.878]), constant_term=-3.441)
+p2 = Plane(normal_vector=Vector([5.111, 6.358, 7.638]), constant_term=-2.152)
+p3 = Plane(normal_vector=Vector([2.016, -9.924, -1.367]), constant_term=-9.278)
+p4 = Plane(normal_vector=Vector([2.167, -13.543, -18.883]), constant_term=-10.567)
+s = LinearSystem([p1,p2,p3,p4])
+print(s.compute_solution())
+'''
 
 
 
