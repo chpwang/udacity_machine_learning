@@ -69,16 +69,16 @@ class LinearSystem(object):
       nonz_indices = new_linearSys.indices_of_first_nonzero_terms_in_each_row()
 
       while k < new_linearSys.dimension:
-        # 若在 i 行之后的某一行里，存在第 i 项的系数不为零，则换位（swap），确保第 i 行第 i 项系数非零
+        # 若 i 行的第 k 项的系数为零，则寻找之后的某一行，其存在第 k 项的系数不为零，换位（swap），确保第 i 行第 k 项系数非零
         if nonz_indices[i] != k:
-          if i in nonz_indices:
+          if k in nonz_indices:
             row_to_swap = nonz_indices.index(i)
             new_linearSys.swap_rows(i, row_to_swap)
             # 换位后更新各行第一个非零项的 位置 列表
             nonz_indices = new_linearSys.indices_of_first_nonzero_terms_in_each_row()
             break
           else:
-            # 如果所有行的第 i 项的系数都为 0 ，则直接跳到下一次循环
+            # 如果所有行的第 k 项的系数都为 0 ，整个方程组无需消去第 k 项（xk），则直接跳到下一次循环，
             k += 1
             continue
         break
