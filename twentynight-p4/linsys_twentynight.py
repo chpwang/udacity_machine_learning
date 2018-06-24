@@ -99,9 +99,12 @@ class LinearSystem(object):
             continue
         break
 
+      if k >= new_linearSys.dimension:
+        break
       # 消除第 k 列的所有其他项（消去除第 i 行之外，所有方程的第 k 项）
       new_linearSys.eliminate_other_column_term_from_row_to_row(i, i+1, len(new_linearSys), 1, k)
       k += 1
+      
       
 
       '''
@@ -155,17 +158,18 @@ class LinearSystem(object):
   
   def compute_solution(self):
     rrf_form = self.compute_rref()
-
     rrf_form.__raise_exception_if_no_solution()
-    rrf_form.__raise_exception_if_there_are_infinite_solutions()
 
     output = ''
-    for i in range(self.dimension):
-      output += "x{} = {} \n".format(i+1, round(rrf_form[i].constant_term, 3))
+    if rrf_form.__raise_exception_if_there_are_infinite_solutions():
+      # raise Exception(self.INF_SOLUTIONS_MSG)
+      para = rrf_form.parameterize_for_infinite_solution()
+      output += "Infinite solutions found...\n{}".format(para)
+    else:
+      for i in range(self.dimension):
+        output += "x{} = {} \n".format(i+1, round(rrf_form[i].constant_term, 3))
     
     return output
-
-
 
   
   def __raise_exception_if_no_solution(self):
@@ -182,15 +186,46 @@ class LinearSystem(object):
         else:
           raise e
 
+
   def __raise_exception_if_there_are_infinite_solutions(self):
     # 在确定有解的前提下，若第 i 行的第一个含非零系数的项不为 i ，则方程化简过程中有变量缺失，故含有多解
     first_nonz_indices = self.indices_of_first_nonzero_terms_in_each_row()
     for i in range(self.dimension):
-      if first_nonz_indices[i] != i:
-        raise Exception(self.INF_SOLUTIONS_MSG)
+      if i >= len(first_nonz_indices) or first_nonz_indices[i] != i:
+        return True
+    return False
+
+
+  def parameterize_for_infinite_solution(self):
+    first_nonz_indices = self.indices_of_first_nonzero_terms_in_each_row()
+    pivots_num = sum([1 if ind >= 0 else 0 for ind in first_nonz_indices])
+    free_var_num = self.dimension-pivots_num
+
+    # 初始化基准点（Base Point）和各方向向量
+    bpoint_list = [0]*self.dimension
+
+    dir_vecs = [[0]*self.dimension for k in range(free_var_num)]
+
     
+    for row, i in enumerate(first_nonz_indices):
+      if i >= 0:
+        bpoint_list[i] = self[row].constant_term
 
+        free_var_ind = 0
+        for j in range(i+1, self.dimension):
+          coef = self[row].normal_vector.coordinates[j]
+          if not MyDecimal(coef).is_near_zero():
+            dir_vecs[free_var_ind][i] = coef * (-1)
+            dir_vecs[free_var_ind][j] = 1
+            free_var_ind += 1
 
+    for ind, dv in enumerate(dir_vecs):
+      dir_vecs[ind] = Vector(dv)
+    bpoint = Vector(bpoint_list)
+
+    return Parameterization(bpoint, dir_vecs)
+      
+        
 
   def __len__(self):
     return len(self.planes)
@@ -215,15 +250,69 @@ class LinearSystem(object):
     ret += '\n'.join(temp)
     return ret
 
-
+# 此类（Class）用来判断某数是否为零
 class MyDecimal(Decimal):
   def is_near_zero(self, eps=1e-10):
     return abs(self) < eps
 
 
+class Parameterization(object):
+
+  def __init__(self, basepoint, direction_vectors):
+
+    self.base_point = basepoint
+    self.direction_vectors = direction_vectors
+    self.dimension = basepoint.dimension
+
+  def __str__(self):
+    ret = "Parametric Equations:"
+    temp = ""
+    for i in range(self.dimension):
+      temp += "\nx{} = {}".format(i+1, round(self.base_point.coordinates[i], 3))
+      
+      for j, v in enumerate(self.direction_vectors):
+        c = v.coordinates[i]
+        if MyDecimal(c).is_near_zero():
+          continue
+        elif c < 0:
+          op = "-"
+        else:
+          op = "+"
+        temp += " {} {}*t{}".format(op, round(abs(c), 3), j+1)
+
+    ret += temp
+    return ret
+    
 
 
 
+
+
+'''
+# test - parameterization output for infinite solutions
+p1 = Plane(normal_vector=Vector([0.786, 0.786, 0.588]), constant_term=-0.714)
+p2 = Plane(normal_vector=Vector([-0.138, -0.138, 0.244]), constant_term=0.319)
+s = LinearSystem([p1,p2])
+print(s.compute_rref())
+print(s.compute_solution())
+
+
+p1 = Plane(normal_vector=Vector([8.631, 5.112, -1.816]), constant_term=-5.113)
+p2 = Plane(normal_vector=Vector([4.315, 11.132, -5.27]), constant_term=-6.775)
+p3 = Plane(normal_vector=Vector([-2.158, 3.01, -1.727]), constant_term=-0.831)
+s = LinearSystem([p1,p2,p3])
+print(s.compute_rref())
+print(s.compute_solution())
+
+
+p1 = Plane(normal_vector=Vector([0.935, 1.76, -9.365]), constant_term=-9.955)
+p2 = Plane(normal_vector=Vector([0.187, 0.352, -1.873]), constant_term=-1.991)
+p3 = Plane(normal_vector=Vector([0.374, 0.704, -3.746]), constant_term=-3.982)
+p4 = Plane(normal_vector=Vector([-0.561, -1.056, 5.619]), constant_term=5.973)
+s = LinearSystem([p1,p2,p3,p4])
+print(s.compute_rref())
+print(s.compute_solution())
+'''
 
 
 
