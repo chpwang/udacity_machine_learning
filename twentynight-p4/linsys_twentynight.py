@@ -291,7 +291,7 @@ class Parameterization(object):
 '''
 # test - parameterization output for infinite solutions
 p1 = Plane(normal_vector=Vector([0.786, 0.786, 0.588]), constant_term=-0.714)
-p2 = Plane(normal_vector=Vector([-0.138, -0.138, 0.244]), constant_term=0.319)
+p2 = Plane(normal_vector=Vector([-0.131, -0.131, 0.244]), constant_term=0.319)
 s = LinearSystem([p1,p2])
 print(s.compute_rref())
 print(s.compute_solution())
