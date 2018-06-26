@@ -286,6 +286,20 @@ class Parameterization(object):
 
 
 
+# example - 解线性方程组（Linear System）
+# Linear System:
+# Equation 1: -7x_1 + 5x_2 - x_3 = 1
+# Equation 2: x_1 - 3x_2 - 8x_3 = 1
+# Equation 3: -10x_1 - 2x_2 + 9x_3 = 1
+
+p1 = Plane(normal_vector=Vector([-7,5,-1]), constant_term=1)
+p2 = Plane(normal_vector=Vector([1,-3,-8]), constant_term=1)
+p3 = Plane(normal_vector=Vector([-10,-2,9]), constant_term=1)
+s = LinearSystem([p1,p2,p3])
+print(s)
+print(s.compute_rref())
+print(s.compute_solution())
+
 
 
 '''
