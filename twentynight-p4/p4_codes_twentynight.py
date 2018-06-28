@@ -105,7 +105,8 @@ def eliminate_other_element_in_column(col, matrx, tolerance=1.0e-9):
             continue
         else:
             addScaledRow(matrx, i, col, scl)
-        
+
+# 高斯消元法 - 解线性方程组，返回唯一解（向量形式），无解或多解时返回 None
 def gj_Solve(A, b, decPts=4, epsilon=1.0e-16):
     a_shp = shape(A)
     b_shp = shape(b)
@@ -184,6 +185,7 @@ def linearRegression(X,Y,dimension=3):
     b = matxMultiply(transpose(aug_X), formated_Y)
     solutions_li = gj_Solve(linSys, b)
     
+    # 对于 y = a0 + a1x1 + a2x2 + ... + anxn ，输出的 coeff 为 [a0, a1, a2 ... an]
     coeff = [k[0] for k in solutions_li]
     return coeff
 
