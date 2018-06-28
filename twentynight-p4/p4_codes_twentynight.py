@@ -25,11 +25,24 @@ def matxRound(M, decPts=0):
     for j,e in enumerate(M[i]):
       M[i][j] = round(e, decPts)
 
+
+
+# 计算矩阵的转置
+'''
+# 我的转置算法
 def transpose(M):
-  t_M = list(zip(*M))
-  for i in range(len(t_M)):
-    t_M[i] = list(t_M[i])
-  return t_M
+    t_M = list(zip(*M))
+    for i in range(len(t_M)):
+        t_M[i] = list(t_M[i])
+    return t_M
+'''
+# 老师提示的转置算法
+# 其实和我的做法思路是一样的，只不过我把 for 循环提取出来了，而老师则嵌在了列表推导式中       
+# 所以如果两种代码效率不同，那可能是我的算法里多了一个赋值操作吧
+def transpose(M):
+    return [list(col) for col in zip(*M)]
+
+
 
 def shape(M):
     rows_num = len(M)
@@ -64,6 +77,10 @@ def matxMultiply(A, B):
         return new_matx
 
 
+
+# 构造增广矩阵，假设A，b行数相同
+'''
+# 我的增广矩阵算法
 def augmentMatrix(A, b):
     a_shp = shape(A)
     b_shp = shape(b)
@@ -74,11 +91,29 @@ def augmentMatrix(A, b):
         aug_matx.append(A[i] + b[i])
 
     return aug_matx
+'''
+# 根据老师的提示优化后的算法
+def augmentMatrix(A, b):
+    a_shp = shape(A)
+    b_shp = shape(b)
+    if a_shp[0] != b_shp[0] or b_shp[1] != 1:
+        raise ValueError("column and row doesn't match. check the inputs.")
 
+    return [ra + rb for ra, rb in zip(A, b)]
+
+
+'''
+# 我的写法
 def swapRows(M, r1, r2):
     temp = M[r1]
     M[r1] = M[r2]
     M[r2] = temp
+'''
+# 按照老师提示改进
+def swapRows(M, r1, r2):
+    M[r1], M[r2] = M[r2], M[r1]
+
+
 
 def scaleRow(M, r, scale):
     if abs(scale) < 1.0e-9:
@@ -189,6 +224,26 @@ def linearRegression(X,Y,dimension=3):
     coeff = [k[0] for k in solutions_li]
     return coeff
 
+
+
+
+# 求 2 元线性回归系数
+# ------------
+# example
+# 点 1: -7x_1 + 5x_2 - x_3 = 1
+# 点 2: x_1 - 3x_2 - 8x_3 = 1
+# 点 3: -10x_1 - 2x_2 + 9x_3 = 1
+
+My_X = [[1],
+     [2],
+     [3]]
+
+# 注意这里的格式，输入是 2 维 list，不是 [1,1,1]
+My_Y = [[1],
+     [2],
+     [2]]
+
+print(linearRegression(My_X,My_Y,dimension=2)) # 输出方程的解
 
 
 

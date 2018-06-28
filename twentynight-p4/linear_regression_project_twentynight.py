@@ -14,7 +14,7 @@
 # [2 Gaussian Jordan 消元法](#2-Gaussian-Jordan-消元法)  
 # [3  线性回归](#3-线性回归)  
 
-# In[95]:
+# In[1]:
 
 
 # 任意选一个你喜欢的整数，这能帮你得到稳定的结果
@@ -25,7 +25,7 @@ seed = 29
 # 
 # ## 1.1 创建一个 4*4 的单位矩阵
 
-# In[96]:
+# In[2]:
 
 
 # 这个项目设计来帮你熟悉 python list 和线性代数
@@ -54,16 +54,21 @@ b = [[1],
      [1],
      [1]]
 
+MyM = [[9,13,5,2], 
+       [1,11,7,6], 
+       [3,7,4,1],
+       [6,0,7,10]]
+
 # 创建一个 4*4 单位矩阵
-I = [[9,13,5,2], 
-     [1,11,7,6], 
-     [3,7,4,1],
-     [6,0,7,10]]
+I = [[1,0,0,0], 
+     [0,1,0,0], 
+     [0,0,1,0],
+     [0,0,0,1]]
 
 
 # ## 1.2 返回矩阵的行数和列数
 
-# In[97]:
+# In[3]:
 
 
 # 返回矩阵的行数和列数
@@ -76,7 +81,7 @@ def shape(M):
     return (rows_num, columns_num)
 
 
-# In[98]:
+# In[4]:
 
 
 # 运行以下代码测试你的 shape 函数
@@ -85,7 +90,7 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 
 # ## 1.3 每个元素四舍五入到特定小数数位
 
-# In[99]:
+# In[5]:
 
 
 # 每个元素四舍五入到特定小数数位
@@ -96,7 +101,7 @@ def matxRound(M, decPts=4):
             M[i][j] = round(e, decPts)
 
 
-# In[100]:
+# In[6]:
 
 
 # 运行以下代码测试你的 matxRound 函数
@@ -105,18 +110,27 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 
 # ## 1.4 计算矩阵的转置
 
-# In[101]:
+# In[7]:
 
 
 # 计算矩阵的转置
+'''
+# 我的转置算法
 def transpose(M):
     t_M = list(zip(*M))
     for i in range(len(t_M)):
         t_M[i] = list(t_M[i])
     return t_M
+'''
+
+# 老师提示的转置算法
+# 其实和我的做法思路是一样的，只不过我把 for 循环提取出来了，而老师则嵌在了列表推导式中       
+# 所以如果两种代码效率不同，那可能是我的算法里多了一个赋值操作吧
+def transpose(M):
+    return [list(col) for col in zip(*M)]
 
 
-# In[102]:
+# In[8]:
 
 
 # 运行以下代码测试你的 transpose 函数
@@ -125,7 +139,7 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 
 # ## 1.5 计算矩阵乘法 AB
 
-# In[103]:
+# In[9]:
 
 
 # 计算矩阵乘法 AB，如果无法相乘则raise ValueError
@@ -152,7 +166,7 @@ def matxMultiply(A, B):
             return new_matx
 
 
-# In[104]:
+# In[10]:
 
 
 # 运行以下代码测试你的 matxMultiply 函数
@@ -186,10 +200,12 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 #     ...    & ... & ... & ...& ...\\
 #     a_{n1}    & a_{n2} & ... & a_{nn} & b_{n} \end{bmatrix}$
 
-# In[105]:
+# In[11]:
 
 
-# TODO 构造增广矩阵，假设A，b行数相同
+# 构造增广矩阵，假设A，b行数相同
+'''
+# 我的增广矩阵算法
 def augmentMatrix(A, b):
     a_shp = shape(A)
     b_shp = shape(b)
@@ -200,9 +216,19 @@ def augmentMatrix(A, b):
         aug_matx.append(A[i] + b[i])
 
     return aug_matx
+'''
+
+# 根据老师的提示优化后的算法
+def augmentMatrix(A, b):
+    a_shp = shape(A)
+    b_shp = shape(b)
+    if a_shp[0] != b_shp[0] or b_shp[1] != 1:
+        raise ValueError("column and row doesn't match. check the inputs.")
+
+    return [ra + rb for ra, rb in zip(A, b)]
 
 
-# In[106]:
+# In[12]:
 
 
 # 运行以下代码测试你的 augmentMatrix 函数
@@ -214,25 +240,31 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 # - 把某行乘以一个非零常数
 # - 把某行加上另一行的若干倍：
 
-# In[107]:
+# In[13]:
 
 
 # r1 <---> r2
 # 直接修改参数矩阵，无返回值
+'''
+# 我的写法
 def swapRows(M, r1, r2):
     temp = M[r1]
     M[r1] = M[r2]
     M[r2] = temp
+'''
+# 按照老师提示改进
+def swapRows(M, r1, r2):
+    M[r1], M[r2] = M[r2], M[r1]
 
 
-# In[108]:
+# In[14]:
 
 
 # 运行以下代码测试你的 swapRows 函数
 get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test_swapRows')
 
 
-# In[109]:
+# In[15]:
 
 
 # r1 <--- r1 * scale
@@ -244,14 +276,14 @@ def scaleRow(M, r, scale):
     M[r] = [x*scale for x in M[r]]
 
 
-# In[110]:
+# In[16]:
 
 
 # 运行以下代码测试你的 scaleRow 函数
 get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test_scaleRow')
 
 
-# In[111]:
+# In[17]:
 
 
 # r1 <--- r1 + r2*scale
@@ -260,7 +292,7 @@ def addScaledRow(M, r1, r2, scale):
     M[r1] = [x+y*scale for x,y in zip(M[r1], M[r2])]
 
 
-# In[112]:
+# In[18]:
 
 
 # 运行以下代码测试你的 addScaledRow 函数
@@ -340,7 +372,7 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 
 # #### 以下开始你的尝试吧!
 
-# In[113]:
+# In[19]:
 
 
 # 不要修改这里！
@@ -372,7 +404,7 @@ printInMatrixFormat(Ab,padding=3,truncating=0)
 #     
 # $...$
 
-# In[114]:
+# In[20]:
 
 
 # 不要修改这里！
@@ -408,7 +440,7 @@ printInMatrixFormat(Ab,padding=3,truncating=0)
 
 # ### 2.3.3 实现 Gaussian Jordan 消元法
 
-# In[115]:
+# In[21]:
 
 
 # 实现 Gaussain Jordan 方法求解 Ax = b
@@ -467,7 +499,7 @@ def gj_Solve(A, b, decPts=4, epsilon=1.0e-16):
     
 
 
-# In[116]:
+# In[22]:
 
 
 # 运行以下代码测试你的 gj_Solve 函数
@@ -498,45 +530,136 @@ get_ipython().run_line_magic('run', '-i -e test.py LinearRegressionTestCase.test
 
 # > **【证明】**
 # >
-# >由于 Z 为全0矩阵，所以有：
-# $ \det A = 
+# >由于 $Z$ 为全 $0$ 矩阵，且 $Y$ 第一列为 $0$，
+# >所以设 $I$ 为 $n$ 阶单位矩阵，有：
+# >$$
+# \displaystyle
+# $$
+# >$$ \det A = 
 # \begin{vmatrix}
 # I & X \\ 
 # Z & Y   \notag
 # \end{vmatrix}
-#  = 
+# -->
 # \begin{vmatrix}
-# I \notag
+# 1 & 0 & \cdots & 0 & & x_{11} & x_{12} & \cdots & x_{1m} \\ 
+# 0 & 1 & \cdots & 0 & & x_{21} & x_{22} & \cdots & x_{2m} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 1 & & x_{n1} & x_{n2} & \cdots & x_{nm} \\
+#   &   &   &   &   &   &   &   &   \\ 
+# 0 & 0 & \cdots & 0 & & 0 & y_{11} & \cdots & y_{1(m-1)} \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{21} & \cdots & y_{2(m-1)} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{m1} & \cdots & y_{m(m-1)} \\
 # \end{vmatrix}
-# \begin{vmatrix}
-# Y \notag
-# \end{vmatrix}$
+# $$
+# >$$
+# \displaystyle
+# $$
 # >
-# >又根据 Y 的第一列全为 0 所以有：
-# $
+# >$$
+# = \begin{vmatrix}
+# 1 & 0 & \cdots & 0 & & x_{11} & x_{12} & \cdots & x_{1m} \\ 
+# 0 & 1 & \cdots & 0 & & x_{21} & x_{22} & \cdots & x_{2m} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 1 & & x_{n1} & x_{n2} & \cdots & x_{nm} \\
+#   &   &   &   &   &   &   &   &   \\ 
+# 0 & 0 & \cdots & 0 & & 0 & y_{11} & \cdots & y_{1(m-1)} \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{21} & \cdots & y_{2(m-1)} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{m1} & \cdots & y_{m(m-1)} \\
+# \end{vmatrix} +
 # \begin{vmatrix}
-# Y \notag
-# \end{vmatrix} = 0$
-# >
-# >于是：
-# $
-# \begin{vmatrix}
-# I \notag
+# 1 & 0 & \cdots & 0 & & 0 & x_{12} & \cdots & x_{1m} \\ 
+# 0 & 1 & \cdots & 0 & & 0 & x_{22} & \cdots & x_{2m} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 1 & & -x_{n1} & x_{n2} & \cdots & x_{nm} \\
+#   &   &   &   &   &   &   &   &   \\ 
+# 0 & 0 & \cdots & 0 & & 0 & y_{11} & \cdots & y_{1(m-1)} \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{21} & \cdots & y_{2(m-1)} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{m1} & \cdots & y_{m(m-1)} \\
 # \end{vmatrix}
-# \begin{vmatrix}
-# Y \notag
-# \end{vmatrix} = 0$
+# $$
+# >$$
+# \displaystyle
+# $$
+# >
+# >$$
+# = \begin{vmatrix}
+# 1 & 0 & \cdots & 0 & & x_{11} & x_{12} & \cdots & x_{1m} \\ 
+# 0 & 1 & \cdots & 0 & & x_{21} & x_{22} & \cdots & x_{2m} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 1 & & 0 & x_{n2} & \cdots & x_{nm} \\
+#   &   &   &   &   &   &   &   &   \\ 
+# 0 & 0 & \cdots & 0 & & 0 & y_{11} & \cdots & y_{1(m-1)} \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{21} & \cdots & y_{2(m-1)} \\
+# \vdots & \vdots & \ddots & \vdots & & \vdots & \vdots & \ddots & \vdots \\
+# 0 & 0 & \cdots & 0 & & 0 & y_{m1} & \cdots & y_{m(m-1)} \\
+# \end{vmatrix}
+# $$
+# >$$
+# \displaystyle
+# $$
+# >
+# >$$
+# \displaystyle
+# $$
+# >
+# >注意，上述相加的两个行列式，右边的行列式由于存在两列呈倍数关系，所以其值为 $0$：
+# >
+# >于是我们很容易继续进行类似变换，在不改变行列式 $\det A$ 的值的情况下，使得：
+# >$$
+# \displaystyle
+# $$
+# >$$
+# \displaystyle
+# $$
+# >$$
+# \begin{matrix}
+# x_{11} \\ 
+# x_{21} \\
+# \vdots \\
+# x_{n1} \\
+# \\
+# 0  \\
+# 0  \\
+# \vdots \\
+# 0 \\
+# \end{matrix}
+# --> 
+# \begin{matrix}
+# 0 \\ 
+# 0 \\
+# \vdots \\
+# 0 \\
+# \\
+# 0  \\
+# 0  \\
+# \vdots \\
+# 0 \\
+# \end{matrix}
+# $$
+# >$$
+# \displaystyle
+# $$
+# >$$
+# \displaystyle
+# $$
+# >（其实就是矩阵的「初等行变换」中，第三类初等变换，即【某行/列】乘 $k$ 倍加到【另一行/列】，行列式的值不变）
 # >
 # >于是：
 # $ \det A = 0$
 # >
-# >因此 A 为奇异矩阵
+# >（此处也可以描述为为行列式 $\det A$ 中，X 的第一列所对应的列，和其他列线性相关，所以行列式 $\det A$ 的值为 $0$）
+# >
+# >因此 $A$ 为奇异矩阵
 
 # # 3 线性回归
 
 # ## 3.1 随机生成样本点
 
-# In[117]:
+# In[23]:
 
 
 # 不要修改这里！
@@ -551,7 +674,7 @@ vs_scatter_2d(X, Y)
 # 
 # ### 3.2.1 猜测一条直线
 
-# In[118]:
+# In[24]:
 
 
 # 请选择最适合的直线 y = mx + b
@@ -569,7 +692,7 @@ vs_scatter_2d(X, Y, m1, b1)
 # MSE = \frac{1}{n}\sum_{i=1}^{n}{(y_i - mx_i - b)^2}
 # $$
 
-# In[119]:
+# In[25]:
 
 
 # 实现以下函数并输出所选直线的MSE
@@ -656,9 +779,6 @@ print(calculateMSE2D(X,Y,m1,b1))
 # >
 # >综上所述，命题得证。
 
-# 
-# 
-
 # ### 3.3.2 实例推演
 # 
 # 现在我们有了一个二元二次方程组
@@ -690,7 +810,7 @@ print(calculateMSE2D(X,Y,m1,b1))
 # >$$
 # \begin{cases}
 # \displaystyle
-# 16m + 6b = 11 \\
+# 14m + 6b = 11 \\
 # \\
 # 6m + 3b = 5 \\
 # \end{cases}
@@ -700,10 +820,10 @@ print(calculateMSE2D(X,Y,m1,b1))
 # >$$
 # \begin{cases}
 # \displaystyle
-# m = \frac{1}{4} \\
+# m = \frac{1}{2} \\
 # \\
 # \displaystyle
-# b = \frac{7}{6} \\
+# b = \frac{2}{3} \\
 # \end{cases}
 # $$
 
@@ -904,7 +1024,7 @@ print(calculateMSE2D(X,Y,m1,b1))
 # 
 # 在3.3 中，我们知道线性回归问题等价于求解 $X^TXh = X^TY$ (如果你选择不做3.3，就勇敢的相信吧，哈哈)
 
-# In[120]:
+# In[26]:
 
 
 # 实现线性回归
@@ -935,7 +1055,7 @@ def linearRegression2D(X,Y):
     return opt_m, opt_b
 
 
-# In[121]:
+# In[27]:
 
 
 # 请不要修改下面的代码
@@ -948,7 +1068,7 @@ print(m2,b2)
 # 你求得的回归结果是什么？
 # 请使用运行以下代码将它画出来。
 
-# In[122]:
+# In[28]:
 
 
 ## 请不要修改下面的代码
@@ -960,7 +1080,7 @@ print(calculateMSE2D(X,Y,m2,b2))
 # 如果你的高斯约当消元法通过了单元测试, 那么它将能够解决多维的回归问题  
 # 你将会在更高维度考验你的线性回归实现
 
-# In[123]:
+# In[29]:
 
 
 # 生成三维的数据点
@@ -1141,7 +1261,7 @@ vs_scatter_3d(X_3d, Y_3d)
 # )
 # $$
 
-# In[124]:
+# In[30]:
 
 
 def linearRegression(X,Y,dimension=3):
@@ -1179,7 +1299,7 @@ def linearRegression(X,Y,dimension=3):
     return coeff
 
 
-# In[125]:
+# In[31]:
 
 
 # 利用新的多元回归系数函数，重新定义 linearRegression2D 函数，再次求上文中的二元线性回归的系数
@@ -1195,14 +1315,14 @@ print(new_fun_m, new_fun_b)
 print(old_func_m, old_func_b)
 
 
-# In[126]:
+# In[32]:
 
 
 coeff = linearRegression(X_3d, Y_3d)
 vs_scatter_3d(X_3d, Y_3d, coeff)
 
 
-# In[127]:
+# In[1]:
 
 
 from subprocess import call
