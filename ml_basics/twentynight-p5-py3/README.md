@@ -13,6 +13,9 @@
 
 优达学城推荐学生安装 [Anaconda](https://www.continuum.io/downloads)，这是一个常用的 Python 集成编译环境，且已包含了本项目中所需的全部函数库。
 
+### 数据和资料
+此项目所使用的数据资料文件 `housing.csv`（波士顿房屋信息）可以从这个 [GitHub 页面](https://github.com/udacity/cn-machine-learning/tree/master/boston_housing) 找到
+
 ### 代码
 
 代码的模版已经在 `boston_housing.ipynb` 文件中给出。你还会用到 `visuals.py` 和名为 `housing.csv` 的数据文件来完成这个项目。我们已经为你提供了一部分代码，但还有些功能需要你来实现才能以完成这个项目。
