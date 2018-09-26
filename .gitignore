@@ -74,3 +74,11 @@ target/
 
 # TensorFlow
 *.pickle
+
+# Udacity checkpoint file
+*.hdf5
+
+# Udacity P2 - DLND files
+*dogImages/
+*lfw/
+*.npz
