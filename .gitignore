@@ -82,3 +82,7 @@ target/
 *dogImages/
 *lfw/
 *.npz
+
+# Udacity P3 - Data files
+deep_learning/part_4_lesson_3_rnn_lstm/sentiment-rnn/data/
+deep_learning/part_4_lesson_3_rnn_lstm/embeddings/data/
