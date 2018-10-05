@@ -78,11 +78,17 @@ target/
 # Udacity checkpoint file
 *.hdf5
 
-# Udacity P2 - DLND files
-*dogImages/
-*lfw/
+# Udacity DLND P2 - Data files
+dogImages/
+lfw/
 *.npz
 
-# Udacity P3 - Data files
+# Udacity DLND P3 - Data files
 deep_learning/part_4_lesson_3_rnn_lstm/sentiment-rnn/data/
 deep_learning/part_4_lesson_3_rnn_lstm/embeddings/data/
+
+# Udacity DLND P4 - Data files
+MNIST_data/
+train_samples.pkl
+
+
