@@ -23,12 +23,30 @@ class Task():
         self.action_high = 900
         self.action_size = 4
 
-        # Goal
+        # Goal - 目标：到达指定的位置 target_pos
         self.target_pos = target_pos if target_pos is not None else np.array([0., 0., 10.]) 
+        
+        # 初始化目标距离
+        self.target_distance = self.get_distance_from_target()
+    
+    # 计算智能体和目标的距离
+    def get_distance_from_target(self):
+        distance_from_target = np.linalg.norm(self.target_pos - self.sim.pose[:3])
+        return distance_from_target
 
     def get_reward(self):
         """Uses current pose of sim to return reward."""
-        reward = 1.-.3*(abs(self.sim.pose[:3] - self.target_pos)).sum()
+        reward = 1.-0.003*(abs(self.sim.pose[:3] - self.target_pos)).sum() # 计算奖励（reward）
+        
+        '''
+        previous_distance = self.target_distance
+        self.target_distance = self.get_distance_from_target()
+        term_1 = 100.0/self.target_distance if self.target_distance > 0.01 else 50000
+        #term_2 = (previous_distance - self.target_distance)
+        #term_3 = -0.4*(abs(self.sim.angular_v)).sum()
+        #print("term_1: {}, term_2: {}, term_3: {}".format(term_1, term_2, term_3))
+        reward = term_1 # + term_2 + term_3
+        '''
         return reward
 
     def step(self, rotor_speeds):
